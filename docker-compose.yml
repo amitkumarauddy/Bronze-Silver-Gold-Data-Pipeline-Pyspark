@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  batch_pipeline:
+    build: .
+    volumes:
+      - ./data:/app/data
+    working_dir: /app
+    command: ["python", "main.py"]
+    environment:
+      - PYTHONUNBUFFERED=1

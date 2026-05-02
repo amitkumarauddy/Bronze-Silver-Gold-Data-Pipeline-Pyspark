@@ -92,6 +92,53 @@ Execute the master orchestrator to run the full pipeline from end-to-end:
 
 python main.py
 
+## 🐳 Docker Containerization
+This project also supports Docker Compose so you can avoid installing Java, Python packages, and Spark locally.
+
+The container runs PySpark and reads/writes data directly from your local `data/` folder. This keeps the image small and ensures Bronze/Silver/Gold output persists after the container stops.
+
+### Why this works
+- `Dockerfile` installs only code and dependencies, not the `data/` folder.
+- `docker-compose.yml` mounts `./data` into the container as `/app/data`.
+- Raw input and output files stay on your host disk, not inside the container image.
+
+### Run with Docker Compose
+```bash
+docker compose up --build
+```
+
+or
+
+```bash
+docker-compose up --build
+```
+
+### Important
+- Put your raw Parquet files under `./data/raw/` before launching.
+- After the container runs, `data/bronze/`, `data/silver/`, and `data/gold/` will be written locally.
+
+## ⚙️ Makefile Command Hub
+A `Makefile` is included to simplify your workflow. Simply type `make` in your terminal to see all available commands:
+
+```bash
+make              # Display help menu
+make build        # Build the Docker image
+make run          # Run the end-to-end pipeline (equivalent to: docker compose up)
+make clean-data   # Delete Bronze, Silver, Gold layers (keeps raw data safe)
+make clean-docker # Remove Docker containers and images
+make nuke         # Complete factory reset (clears data + Docker)
+```
+
+Example usage:
+```bash
+# First time: build and run
+make build
+make run
+
+# Reset everything
+make nuke
+```
+
 📊 Performance Metrics
 Running locally with custom Spark memory configurations (4GB Driver/Executor limit), the pipeline processes the data with the following benchmarks:
 

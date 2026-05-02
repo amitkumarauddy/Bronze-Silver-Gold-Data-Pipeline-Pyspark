@@ -55,9 +55,19 @@ nyc_taxi_pipeline/
 1. Prerequisites
 Python 3.8+
 
-Java 8 or 11 (Required for Apache Spark)
+Java 8, 11, or 17 (Required for Apache Spark)
 
-(Windows Users Only): Requires winutils.exe and hadoop.dll configured in the system PATH or injected dynamically at runtime.
+Linux / macOS:
+```bash
+sudo apt install openjdk-17-jdk
+export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+> If the pipeline fails with `JAVA_HOME is not set` or a PySpark error like `Java gateway process exited before sending its port number`, this usually means Java is not installed or `JAVA_HOME` is not configured correctly.
+
+Windows Users Only:
+* Requires `winutils.exe` and `hadoop.dll` configured in the system PATH or injected dynamically at runtime.
 
 2. Installation
 Clone the repository and set up a virtual environment:

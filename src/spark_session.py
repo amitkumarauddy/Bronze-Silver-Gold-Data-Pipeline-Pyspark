@@ -1,8 +1,42 @@
 from pyspark.sql import SparkSession
 import os
 import sys
+import shutil
+
+
+def _find_java_home():
+    java_path = shutil.which("java")
+    if not java_path:
+        return None
+
+    java_real = os.path.realpath(java_path)
+    java_home = os.path.dirname(os.path.dirname(java_real))
+    return java_home if os.path.exists(java_home) else None
+
+
+def _ensure_java_home():
+    if os.environ.get("JAVA_HOME"):
+        return
+
+    java_home = _find_java_home()
+    if java_home:
+        os.environ["JAVA_HOME"] = java_home
+        return
+
+    raise EnvironmentError(
+        "JAVA_HOME is not set and Java was not found in PATH. "
+        "Install Java 8, 11, or 17 and set JAVA_HOME before running the pipeline. "
+        "Example on Linux:\n"
+        "  sudo apt install openjdk-17-jdk\n"
+        "  export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64\n"
+        "  export PATH=\"$JAVA_HOME/bin:$PATH\"\n"
+        "Then run: python main.py"
+    )
+
 
 def get_spark():
+    _ensure_java_home()
+
     # Fix for Windows PySpark HADOOP_HOME and DLL errors
     if sys.platform.startswith('win'):
         current_dir = os.path.dirname(os.path.abspath(__file__))
